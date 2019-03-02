@@ -28,7 +28,7 @@ def print_cos_sim1(some_df):
     sim = cosine_similarity(some_df)
     # the cosine_similarity function returns a simmetric matrix, any row/column contains all the values we need:
     mean = (sum(sim[0]) - 1) / len(sim[0]) # we substract that 1 to not count the similarity with the vector with itself
-    print("The mean of the cosine similarity of every pair of different vectors of the topic %s is %s" % (topic, round(mean, 3)))
+    print("The mean of the cosine similarity of every pair of different vectors of the topic '%s' is %s" % (topic, round(mean, 3)))
 
 for topic in doc_csv.index.levels[0]:
     print_cos_sim1(doc_csv.loc[topic])

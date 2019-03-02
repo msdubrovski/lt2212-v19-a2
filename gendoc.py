@@ -82,12 +82,24 @@ article_vec = [name[1] for name in file_list]
 multindex = pd.MultiIndex.from_arrays([topic_vec, article_vec], names=('topic', 'document'))
 doc_df.index = multindex
 
-# You may add whatever other options you want for your testing convenience.
-# Document them using Python's argparse. The format of the file you output is up to you,
-# except that it should be minimally human-readable, at least so that we can trace
-# which vector refers to which article file name. You will also need to keep track of
-# the topic under which it occurred, and eliminate duplicate vectors (printing to the
-# command line which articles got dropped).
+# taking care of duplicates ##############
+# repeated BY NAME are: but this makes no sense because the names are the same in both subfolders
+# doc_df["document2"] = doc_df.index.get_level_values("document")
+# repeated = doc_df[doc_df.duplicated(subset= "document2")]
+# if len(repeated) > 0:
+#     print("The following %s repeated documents have been removed from the data set:" %len(repeated))
+#     for item in repeated.index.get_level_values(1):
+#         print(item)
+#     doc_df = doc_df.drop_duplicates(subset = "document2")
+#     doc_df = doc_df.drop("document2", axis = 1)
+# repeated BY VALUE are:
+repeated = doc_df[doc_df.duplicated()]
+if len(repeated) > 0:
+    print("The following %s repeated documents have been removed from the data set:" %len(repeated))
+    print(repeated.index.get_level_values(1).values)
+    doc_df = doc_df.drop_duplicates()
+#doc_df.duplicated()
+#doc_df = doc_df.drop_duplicates()
 
 # tf-idf #######################################
 #if args.tfidf:
@@ -97,8 +109,6 @@ doc_df.index = multindex
     #X_tfidf.shape
     #doc_tfidf = pd.DataFrame(X_tfidf)
     #doc_df = pd.DataFrame(X_tfidf)
-
-# you need to look for uniqueness: # df.name.unique()
 
 # SVD #######################################
 # if args.svd:
