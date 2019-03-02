@@ -9,7 +9,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 
 
 parser = argparse.ArgumentParser(description="Generate term-document matrix.")
-parser.add_argument("-T", "--tfidf", action="store_true", help="Apply tf-idf to the matrix.")
+parser.add_argument("-T", "--tfidf", action="store_true",
+                    help="Apply tf-idf to the matrix.")
 parser.add_argument("-S", "--svd", metavar="N", dest="svddims", type=int,
                     default=None,
                     help="Use TruncatedSVD to truncate to N dimensions")
@@ -29,26 +30,23 @@ if not args.basedims:
     print("Using full vocabulary.")
 else:
     print("Using only top {} terms by raw count.".format(args.basedims))
-    #M = args.basedims
 
 if args.tfidf:
     print("Applying tf-idf to raw counts.")
 
 if args.svddims:
     print("Truncating matrix to {} dimensions via singular value decomposition.".format(args.svddims))
-    #N = args.svddims
 
 print("Writing matrix to {}.".format(args.outputfile))
 
-foldername = args.foldername
-outputfile = args.outputfile
-
 # extract subfolders and files names
+foldername = args.foldername
 subfolds = os.listdir(foldername)
 file_list = [(subf, filename) for subf in subfolds for filename in os.listdir(foldername+subf)]
 
 # read all files at once and extract vocabulary (with counts)
-myregex = r"[\d\.\,\:\;\!\*%&\?€#@£$∞§\|\[\]\(\){}\-\>\<]*"
+#myregex = r"[\d\.\,\:\;\!\*%&\?€#@£$∞§\|\[\]\(\){}\-\>\<]*"
+myregex = r"[^a-zA-Z\s]+"
 vocab = {}
 for subf, filename in file_list:
     with open(foldername + "/" + subf + "/" + filename, "r", encoding = "utf-8") as f:
@@ -63,7 +61,7 @@ vocab_list = [pair[0] for pair in vocab]
 if args.basedims:
     vocab_list = vocab_list[:args.basedims]
 
-# read again the files and store a document verctor
+# read again the files and store a document vector for each
 vectors = []
 for subf, filename in file_list:
     vector = {word:0 for word in vocab_list}
@@ -73,20 +71,16 @@ for subf, filename in file_list:
             if word in vector.keys():
                 vector[word] += 1
         # clear the vector to be, well, a vector
-        #v = [subf, filename] +
         v = list(vector.values())
         vectors.append(v)
 
-# create a data frame
+# create a data frame, with the apropiate (multi)index
 doc_df = pd.DataFrame(vectors)
 doc_df.columns = vocab_list
 topic_vec = [name[0] for name in file_list]
 article_vec = [name[1] for name in file_list]
 multindex = pd.MultiIndex.from_arrays([topic_vec, article_vec], names=('topic', 'document'))
 doc_df.index = multindex
-
-#newindex = pd.MultiIndex.from_tuples(list(zip(tickers, dates)))
-#bigdf.index = newindex
 
 # You may add whatever other options you want for your testing convenience.
 # Document them using Python's argparse. The format of the file you output is up to you,
@@ -96,23 +90,24 @@ doc_df.index = multindex
 # command line which articles got dropped).
 
 # tf-idf #######################################
-# if ..
-X = doc_df.values
-tfidf_transformer = TfidfTransformer()
-X_tfidf = tfidf_transformer.fit_transform(X)
-X_tfidf.shape
-doc_tfidf = pd.DataFrame(X_tfidf) # ????
-# y al acabar debería tener el mismo nombre, doc_df
+#if args.tfidf:
+    #X = doc_df.values
+    #tfidf_transformer = TfidfTransformer()
+    #X_tfidf = tfidf_transformer.fit_transform(X)
+    #X_tfidf.shape
+    #doc_tfidf = pd.DataFrame(X_tfidf)
+    #doc_df = pd.DataFrame(X_tfidf)
 
-# for the uniqueness thing:
-# df.name.unique()
+# you need to look for uniqueness: # df.name.unique()
 
 # SVD #######################################
-# if ..
-svd = TruncatedSVD(n_components=N, n_iter=7, random_state=42)
-svd.fit(X)  
-TruncatedSVD(algorithm='randomized', n_components=5, n_iter=7,
-        random_state=42, tol=0.0)
+# if args.svd:
+#     svd = TruncatedSVD(n_components=args.svddims, n_iter=7, random_state=42)
+#     svd.fit(X)  
+#     TruncatedSVD(algorithm='randomized', n_components=5, n_iter=7,
+#         random_state=42, tol=0.0)
 
-# creating an output file
-doc_df.to_csv(path_or_buf = outputfile, header = True, index = True)
+
+################ finally, ##############
+# create an output file
+doc_df.to_csv(path_or_buf = args.outputfile, header = True, index = True)
