@@ -6,8 +6,9 @@ My name: Elena Rodriguez
 
 ## Additional instructions
 
-Document here additional command-line instructions or other details you
-want us to know about running your code.
+A comment regarding finding duplicates: My code looks for duplicated document vectors by value, that is, if two documents have the same number of occurrences of every word they're discarted as duplicates. Which makes sense up to a point: if the vocabulary is cuted down it might be the case that some documents coincide in the number of the most frequent words.
+On the other hand, dismissing documents that share the same name might no be a good idea, if for instance the files are named as an enumeration "file1, file2,..". This is the case for the data we were given.
+However, another argument could be added for giving the option of erasing duplicates by name or by value (or none).
 
 ## File naming convention
 
@@ -15,6 +16,8 @@ want us to know about running your code.
 created with what parameters.)
 
 ## Results and discussion
+
+From Part 1&2: The mean values are somewhat consistent and the cosine similarity is higher when comparing vectors from the same topic (subfolder), which again is consistent and points out that there is, at least some, relation between documents in the same topic.
 
 ### Vocabulary restriction.
 
