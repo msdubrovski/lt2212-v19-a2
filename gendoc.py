@@ -35,7 +35,8 @@ if args.tfidf:
 
 if args.svddims:
     if not args.tfidf:
-        exit("Error: You need to convert to TF-IDF in order to perform SVM; add -T.")
+        print("Warning: You should convert to TF-IDF to perform SVM.")
+        print("Truncating matrix to {} dimensions via singular value decomposition.".format(args.svddims))
     elif args.basedims and args.basedims < args.svddims:
         exit("Error: The dimensions of the vocabulary can't be smaller than the target SVM.")
     else:
@@ -43,7 +44,7 @@ if args.svddims:
 
 print("Writing matrix to {}.".format(args.outputfile))
 
-# extract subfolders and files names
+# extract subfolders and file names
 if not re.search("/$", args.foldername):
     foldername = args.foldername + "/"
 else: # im adding a final "/" to the path in case i forget to write it right =D
