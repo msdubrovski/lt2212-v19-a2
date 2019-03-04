@@ -7,7 +7,6 @@ import pandas as pd
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfTransformer
 
-
 parser = argparse.ArgumentParser(description="Generate term-document matrix.")
 parser.add_argument("-T", "--tfidf", action="store_true",
                     help="Apply tf-idf to the matrix.")
@@ -35,12 +34,21 @@ if args.tfidf:
     print("Applying tf-idf to raw counts.")
 
 if args.svddims:
-    print("Truncating matrix to {} dimensions via singular value decomposition.".format(args.svddims))
+    if not args.tfidf:
+        exit("Error: You need to convert to TF-IDF in order to perform SVM; add -T.")
+    elif args.basedims and args.basedims < args.svddims:
+        exit("Error: The dimensions of the vocabulary can't be smaller than the target SVM.")
+    else:
+        print("Truncating matrix to {} dimensions via singular value decomposition.".format(args.svddims))
 
 print("Writing matrix to {}.".format(args.outputfile))
 
 # extract subfolders and files names
-foldername = args.foldername
+if not re.search("/$", args.foldername):
+    foldername = args.foldername + "/"
+else: # im adding a final "/" to the path in case i forget to write it right =D
+    foldername = args.foldername
+
 subfolds = os.listdir(foldername)
 file_list = [(subf, filename) for subf in subfolds for filename in os.listdir(foldername+subf)]
 
@@ -98,26 +106,27 @@ if len(repeated) > 0:
     print("The following %s repeated documents have been removed from the data set:" %len(repeated))
     print(repeated.index.get_level_values(1).values)
     doc_df = doc_df.drop_duplicates()
-#doc_df.duplicated()
-#doc_df = doc_df.drop_duplicates()
+    multindex2 = doc_df.index
 
 # tf-idf #######################################
-#if args.tfidf:
-    #X = doc_df.values
-    #tfidf_transformer = TfidfTransformer()
-    #X_tfidf = tfidf_transformer.fit_transform(X)
+if args.tfidf:
+    tfidf_transformer = TfidfTransformer()
+    X_tfidf = tfidf_transformer.fit_transform(doc_df.values).toarray()
     #X_tfidf.shape
-    #doc_tfidf = pd.DataFrame(X_tfidf)
-    #doc_df = pd.DataFrame(X_tfidf)
+    doc_df = pd.DataFrame(X_tfidf)
 
 # SVD #######################################
-# if args.svd:
-#     svd = TruncatedSVD(n_components=args.svddims, n_iter=7, random_state=42)
-#     svd.fit(X)  
-#     TruncatedSVD(algorithm='randomized', n_components=5, n_iter=7,
-#         random_state=42, tol=0.0)
-
+if args.svddims:
+    svd = TruncatedSVD(n_components = args.svddims, algorithm="randomized",
+                        n_iter=5, random_state=None, tol=0.0)
+    X_svd = svd.fit_transform(doc_df.values)
+    doc_df = pd.DataFrame(X_svd)
+    # the columns change but rows should be the same, we glue the (updated) multindex to it:
+    doc_df.index = multindex2
 
 ################ finally, ##############
 # create an output file
 doc_df.to_csv(path_or_buf = args.outputfile, header = True, index = True)
+
+print("These are the first lines written in '%s'" %args.outputfile)
+print(doc_df.iloc[:10])
