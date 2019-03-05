@@ -27,7 +27,9 @@ sentence or less.)
 
 ### Result table
 
-(Try to use the Markdown table format for this.)
+File | CS_Topic1 | CS_Topic2 | CS_topics  
+ --- | --- | --- 
+ try1.txt  |  0.939  |  0.833  |  0.7020859344822292 
 
 ### The hypothesis in your own words
 
