@@ -20,6 +20,8 @@ parser.add_argument("foldername", type=str,
                     help="The base folder name containing the two topic subfolders.")
 parser.add_argument("outputfile", type=str,
                     help="The name of the output file for the matrix data.")
+parser.add_argument("-D", "--duplicates", type=str, choices=["v", "n"],
+                    help="how to look for duplicates, by 'value' or by 'name', if not specified they're ignored")
 
 args = parser.parse_args()
 
@@ -92,22 +94,27 @@ multindex = pd.MultiIndex.from_arrays([topic_vec, article_vec], names=('topic', 
 doc_df.index = multindex
 
 # taking care of duplicates ##############
-# repeated BY NAME are: but this makes no sense because the names are the same in both subfolders
-# doc_df["document2"] = doc_df.index.get_level_values("document")
-# repeated = doc_df[doc_df.duplicated(subset= "document2")]
-# if len(repeated) > 0:
-#     print("The following %s repeated documents have been removed from the data set:" %len(repeated))
-#     for item in repeated.index.get_level_values(1):
-#         print(item)
-#     doc_df = doc_df.drop_duplicates(subset = "document2")
-#     doc_df = doc_df.drop("document2", axis = 1)
-# repeated BY VALUE are:
-repeated = doc_df[doc_df.duplicated()]
-if len(repeated) > 0:
-    print("The following %s repeated documents have been removed from the data set:" %len(repeated))
-    print(repeated.index.get_level_values(1).values)
-    doc_df = doc_df.drop_duplicates()
-    multindex2 = doc_df.index
+if args.duplicates:
+    # repeated BY NAME are: but this makes no sense because the names are the same in both subfolders
+    if args.duplicates == "n":
+        doc_df["document2"] = doc_df.index.get_level_values("document")
+        repeated = doc_df[doc_df.duplicated(subset= "document2")]
+        if len(repeated) > 0:
+            print("The following %s repeated documents have been removed from the data set:" %len(repeated))
+            for item in repeated.index.get_level_values(1):
+                print(item)
+            doc_df = doc_df.drop_duplicates(subset = "document2")
+            doc_df = doc_df.drop("document2", axis = 1)
+            multindex = doc_df.index
+
+    # repeated BY VALUE are:
+    if args.duplicates == "v":
+        repeated = doc_df[doc_df.duplicated()]
+        if len(repeated) > 0:
+            print("The following %s repeated documents have been removed from the data set:" %len(repeated))
+            print(repeated.index.get_level_values(1).values)
+            doc_df = doc_df.drop_duplicates()
+            multindex = doc_df.index
 
 # tf-idf #######################################
 if args.tfidf:
@@ -115,6 +122,7 @@ if args.tfidf:
     X_tfidf = tfidf_transformer.fit_transform(doc_df.values).toarray()
     #X_tfidf.shape
     doc_df = pd.DataFrame(X_tfidf)
+    doc_df.index = multindex
 
 # SVD #######################################
 if args.svddims:
@@ -123,7 +131,7 @@ if args.svddims:
     X_svd = svd.fit_transform(doc_df.values)
     doc_df = pd.DataFrame(X_svd)
     # the columns change but rows should be the same, we glue the (updated) multindex to it:
-    doc_df.index = multindex2
+    doc_df.index = multindex
 
 ################ finally, ##############
 # create an output file
