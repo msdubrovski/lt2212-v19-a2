@@ -29,10 +29,11 @@ From Part 1&2: The mean values are somewhat consistent and the cosine similarity
 sentence or less.)
 
 ### Result table
-This is a sample table cos I havent decided on the -B restriction yet. 
-| File | cos_sim_1 | cos_sim_2 | cos_sim_12 | 
-| --- | ---: | ---: | ---: | 
-| try1  |  0.939  |  0.833  |  0.702  |  
+This is a sample table cos I havent decided on the -B restriction yet.
+
+| File | cos_sim_1 | cos_sim_2 | cos_sim_12 |
+| --- | ---: | ---: | ---: |
+| try1  |  0.939  |  0.833  |  0.702  |
 
 ### The hypothesis in your own words
 
