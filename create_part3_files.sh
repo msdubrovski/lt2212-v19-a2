@@ -2,7 +2,7 @@
 # this short script will create the files for part 3
 # relative path to the folder
 FOLDER=../ass2_data 
-B=200
+B=p
 
 # 1- one file containing a term-document matrix with no vocabulary restriction and no other transformations.
 python3 gendoc.py -D v $FOLDER output_01_.txt

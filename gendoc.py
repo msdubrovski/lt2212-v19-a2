@@ -14,8 +14,9 @@ parser.add_argument("-S", "--svd", metavar="N", dest="svddims", type=int,
                     default=None,
                     help="Use TruncatedSVD to truncate to N dimensions")
 parser.add_argument("-B", "--base-vocab", metavar="M", dest="basedims",
-                    type=int, default=None,
-                    help="Use the top M dims from the raw counts before further processing")
+                    default=None, type=str,
+                    help="Use the top M dims from the raw counts before further processing. "
+                        "if set to 'p' the top 20percent is taken.")
 parser.add_argument("foldername", type=str,
                     help="The base folder name containing the two topic subfolders.")
 parser.add_argument("outputfile", type=str,
@@ -27,10 +28,16 @@ args = parser.parse_args()
 
 print("Loading data from directory {}.".format(args.foldername))
 
+
 if not args.basedims:
     print("Using full vocabulary.")
 else:
-    print("Using only top {} terms by raw count.".format(args.basedims))
+    try:
+        basedims = int(args.basedims)
+        print("Using only top {} terms by raw count.".format(basedims))
+    except ValueError:
+        basedims = False
+        print("Using top 20%p frequent words.")
 
 if args.tfidf:
     print("Applying tf-idf to raw counts.")
@@ -70,7 +77,11 @@ vocab = [(w, vocab[w]) for w in sorted(vocab, key=vocab.get, reverse=True)]
 vocab_list = [pair[0] for pair in vocab]
 # filter vocab if specified
 if args.basedims:
-    vocab_list = vocab_list[:args.basedims]
+    if basedims:
+        vocab_list = vocab_list[:basedims]
+    else:
+        basedims = len(vocab_list)*2 // 100
+        vocab_list = vocab_list[:basedims]
 
 # read again the files and store a document vector for each
 vectors = []
