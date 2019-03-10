@@ -26,8 +26,9 @@ I chose to restrict the vocabualry to the 20% most frequent words, that is, to t
 
 ### Result table
 The following table contains the results from running `simdoc-py` over the output files 1-8. The "options" column specifies the arguments that were used; "cos_sim" 1 and 2 are simply the cosine similarities within topics (subfolders) 1 and 2; consequentely the last colum corresponds to the crossed cosine similarity.
-| File | Options | cos_sim_1 | cos_sim_2 | cos_sim_12 | 
-| --- | :---: | ---: | ---: | ---: | 
+
+| File | Options | cos_sim_1 | cos_sim_2 | cos_sim_12 |
+| --- | :---: | ---: | ---: | ---: |
 | 01  |    |  0.461  |  0.454  |  0.332  |
 | 02  |  Bp  |  0.576  |  0.572  |  0.438  |
 | 03  |  T  |  0.114  |  0.103  |  0.076  |
@@ -35,7 +36,8 @@ The following table contains the results from running `simdoc-py` over the outpu
 | 05  |  S100  |  0.577  |  0.568  |  0.442  |
 | 06  |  S1000  |  0.461  |  0.454  |  0.332  |
 | 07  |  TS100  |  0.304  |  0.327  |  0.18  |
-| 08  |  TS1000  |  0.114  |  0.103  |  0.076  |  
+| 08  |  TS1000  |  0.114  |  0.103  |  0.076  |
+
 > The option "Bp" means that `gendoc.py` was called with the argument -B with the option of getting the top 20% rather than a fixed number. For this data is around 205 words.
 
 ### The hypothesis in your own words
@@ -46,4 +48,4 @@ Overall, the mean values are somewhat consistent and the cosine similarity is hi
 
 There is some increase when restricting the vocabulary to the most frequent words, and also when truncating to a small number of dimensions. The fact that the cosine similarity drops when applying tf-itf is a good sign, nevertheless. Tf-idf transforms document vectors penalizing frequent words and rewarding distinctive ones. Thus, it transforms document vectors by increasing precisely in what they differ, and so the cosine similarity, which measures how much they are alike, decreases.
 
-Although, as mentioned above, there is consistency in the data, the result don't provide strong evidence for the hypothesis, as the values vary across the different transformations too much, and not that much between topics. 
+Even though there is consistency in the data, the results don't provide strong evidence for the hypothesis, as the values vary a lot across different transformations, but not that much between topics. 
