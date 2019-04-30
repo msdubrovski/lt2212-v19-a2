@@ -48,4 +48,10 @@ Overall, the mean values are somewhat consistent and the cosine similarity is hi
 
 There is some increase when restricting the vocabulary to the most frequent words, and also when truncating to a small number of dimensions. The fact that the cosine similarity drops when applying tf-itf is a good sign, nevertheless. Tf-idf transforms document vectors penalizing frequent words and rewarding distinctive ones. Thus, it transforms document vectors by increasing precisely in what they differ, and so the cosine similarity, which measures how much they are alike, decreases.
 
-Even though there is consistency in the data, the results don't provide strong evidence for the hypothesis, as the values vary a lot across different transformations, but not that much between topics. 
+Even though there is consistency in the data, the results don't provide strong evidence for the hypothesis, as the values vary a lot across different transformations, but not that much between topics.
+
+### Part Bonus: doing it better?
+
+As mentioned above, the results suggest that there is indeed a correlation between topics but it is not strong enough to use it as a classifier. A possible explanation could be that our approach is too naïve, as we're simply comparing the occurences in the vocabulary as a whole.
+
+One simple option could be to compare ocurrences from different subsets of the vocabulary, and consider those scores independently. For example similarity over a subset of stop-words might need to be more sensitive as the distribution of stop-words tends to be similar across unrelated topics. Other subsets could be defined from tf-idf transformations, as it is a way of pointing out significant words of a document.
